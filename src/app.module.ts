@@ -6,6 +6,7 @@ import { CatsModule } from './cats/cats.module.js';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware.js';
 import { ColorMiddleWare } from './common/middleware/color.middleware.js';
+import { TodosModule } from './todos/todos.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -19,6 +20,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       serviceId: 'nest',
     }),
     CatsModule,
+    TodosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
