@@ -1,58 +1,98 @@
-import { Injectable,NotFoundException  } from '@nestjs/common';
+/*
+ * @Author: chenhui 18910431294@163.com
+ * @Date: 2026-11-04 15:37:08
+ * @LastEditors: chenhui 18910431294@163.com
+ * @LastEditTime: 2026-11-06 14:30:43
+ * @FilePath: \nest\src\todos\todos.service.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FindOptionsWhere, Like, Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto.js';
 import { UpdateTodoDto } from './dto/update-todo.dto.js';
-
-
-export interface Todo {
-  id: number;
-  title: string;
-  completed: boolean;
-}
+import { QueryTodoDto } from './dto/query-todo.dto';
+import { Todo } from './entities/todo.entity';
 
 @Injectable()
 export class TodosService {
-  private todolist: Todo[] = []
-  private nextId: number  = 1
+  constructor(
+    @InjectRepository(Todo)
+    private readonly todoRepository: Repository<Todo>,
+  ) {}
 
   create(createTodoDto: CreateTodoDto) {
-    const todo :Todo ={
-      id:this.nextId++,
+    const todo = this.todoRepository.create({
       title: createTodoDto.title,
-      completed: true
-    }
-    this.todolist.push(todo)
-    return todo
+      completed: false,
+    });
+    return this.todoRepository.save(todo);
   }
 
-  findAll() {
-    return this.todolist;
+  async findAll(query: QueryTodoDto) {
+    const { page, limit, keyword, complated } = query;
+
+    const where: FindOptionsWhere<Todo> = {};
+
+    if (keyword?.trim()) {
+      where.title = Like(`%${keyword.trim()}%`);
+    }
+
+    if (complated !== undefined) {
+      where.completed = complated;
+    }
+
+    const [items, total] = await this.todoRepository.findAndCount({
+      where,
+      order: {
+        id: 'DESC',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   findOne(id: number) {
-    const find = this.todolist.find(item=>item.id === id);
-    if(!find){
-      throw new NotFoundException(`代办${id}不存在`)
+    const todo = this.todoRepository.findOneBy({ id });
+    if (!todo) {
+      throw new NotFoundException(`代办${id}不存在`);
     }
-    return find;
+    return todo;
   }
 
-  update(id: number, updateTodoDto: UpdateTodoDto) {
-    const todo = this.findOne(id);
-    
-    if(updateTodoDto.title !== undefined){
-       todo.title = updateTodoDto.title
+  async update(id: number, updateTodoDto: UpdateTodoDto) {
+    const todo = await this.findOne(id);
+
+    if (!todo) {
+      return;
+    }
+
+    if (updateTodoDto.title !== undefined) {
+      todo.title = updateTodoDto.title;
     }
     if (updateTodoDto.completed !== undefined) {
       todo.completed = updateTodoDto.completed;
     }
 
-    return todo
+    return todo;
   }
 
-  remove(id: number) {
-   const todo = this.findOne(id);
+  async remove(id: number) {
+    const todo = await this.findOne(id);
+    if (!todo) {
+      return;
+    }
 
-    this.todolist = this.todolist.filter((item) => item.id !== id);
-    return todo;
+    await this.todoRepository.remove(todo);
+
+    return { ...todo, id };
   }
 }
