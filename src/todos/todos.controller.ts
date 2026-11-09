@@ -6,7 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-  Query
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { TodosService } from './todos.service.js';
 import { CreateTodoDto } from './dto/create-todo.dto.js';
@@ -28,17 +29,20 @@ export class TodosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.todosService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.todosService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
-    return this.todosService.update(+id, updateTodoDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTodoDto: UpdateTodoDto,
+  ) {
+    return this.todosService.update(id, updateTodoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.todosService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.todosService.remove(id);
   }
 }

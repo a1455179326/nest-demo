@@ -60,8 +60,8 @@ export class TodosService {
     };
   }
 
-  findOne(id: number) {
-    const todo = this.todoRepository.findOneBy({ id });
+  async findOne(id: number) {
+    const todo = await this.todoRepository.findOneBy({ id });
     if (!todo) {
       throw new NotFoundException(`代办${id}不存在`);
     }
