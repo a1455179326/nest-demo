@@ -22,6 +22,8 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ColorMiddleWare } from './common/middleware/color.middleware';
 import { TodosModule } from './todos/todos.module';
 import { AnimalsModule } from './animals/animals.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -43,6 +45,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     CatsModule,
     TodosModule,
     AnimalsModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
