@@ -2,7 +2,7 @@
  * @Author: chenhui 18910431294@163.com
  * @Date: 2026-11-11 09:02:06
  * @LastEditors: chenhui 18910431294@163.com
- * @LastEditTime: 2026-11-11 13:30:42
+ * @LastEditTime: 2026-11-13 09:12:01
  * @FilePath: \nest\src\users\users.service.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,12 +21,19 @@ export class UsersService {
   findByUsername(username: string) {
     return this.userRepository.findOneBy({ username });
   }
+  findByUsernameWithPassword(username: string) {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.username = :username', { username })
+      .getOne();
+  }
 
-  create(username:string,passwordHash:string){
+  create(username: string, passwordHash: string) {
     const user = this.userRepository.create({
-        username,
-        passwordHash
-    })
-    return this.userRepository.save(user)
+      username,
+      passwordHash,
+    });
+    return this.userRepository.save(user);
   }
 }
