@@ -2,7 +2,7 @@
  * @Author: chenhui 18910431294@163.com
  * @Date: 2026-11-11 09:02:16
  * @LastEditors: chenhui 18910431294@163.com
- * @LastEditTime: 2026-11-13 15:59:45
+ * @LastEditTime: 2026-11-17 14:14:59
  * @FilePath: \nest\src\auth\auth.service.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -79,7 +79,6 @@ export class AuthService {
     await this.usersService.findByUsernameWithPassword(
       dto.username,
     );
-    // console.log(user)
 
   // 用户不存在也走一次哈希比较之外的分支，
   // 统一返回相同错误提示。

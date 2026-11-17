@@ -2,7 +2,7 @@
  * @Author: chenhui 18910431294@163.com
  * @Date: 2026-11-02 16:14:22
  * @LastEditors: chenhui 18910431294@163.com
- * @LastEditTime: 2026-11-06 15:09:48
+ * @LastEditTime: 2026-11-17 15:50:02
  * @FilePath: \nest\src\app.module.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { createObserveModule } from '@nestjs/observe';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
@@ -24,7 +25,7 @@ import { TodosModule } from './todos/todos.module';
 import { AnimalsModule } from './animals/animals.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
@@ -49,7 +50,13 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

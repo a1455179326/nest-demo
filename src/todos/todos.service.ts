@@ -21,18 +21,19 @@ export class TodosService {
     private readonly todoRepository: Repository<Todo>,
   ) {}
 
-  create(createTodoDto: CreateTodoDto) {
+  create(userId: number,createTodoDto: CreateTodoDto) {
     const todo = this.todoRepository.create({
       title: createTodoDto.title,
       completed: false,
+          userId,
     });
     return this.todoRepository.save(todo);
   }
 
-  async findAll(query: QueryTodoDto) {
+  async findAll(userId: number,query: QueryTodoDto) {
     const { page, limit, keyword, complated } = query;
 
-    const where: FindOptionsWhere<Todo> = {};
+    const where: FindOptionsWhere<Todo> = {userId };
 
     if (keyword?.trim()) {
       where.title = Like(`%${keyword.trim()}%`);
@@ -60,16 +61,16 @@ export class TodosService {
     };
   }
 
-  async findOne(id: number) {
-    const todo = await this.todoRepository.findOneBy({ id });
+  async findOne(userId: number,id: number) {
+    const todo = await this.todoRepository.findOneBy({ id,userId });
     if (!todo) {
       throw new NotFoundException(`代办${id}不存在`);
     }
     return todo;
   }
 
-  async update(id: number, updateTodoDto: UpdateTodoDto) {
-    const todo = await this.findOne(id);
+  async update(userId: number,id: number, updateTodoDto: UpdateTodoDto) {
+    const todo = await this.findOne(userId,id);
 
     if (!todo) {
       return;
@@ -85,8 +86,8 @@ export class TodosService {
     return todo;
   }
 
-  async remove(id: number) {
-    const todo = await this.findOne(id);
+  async remove(userId: number,id: number) {
+    const todo = await this.findOne(userId,id);
     if (!todo) {
       return;
     }
